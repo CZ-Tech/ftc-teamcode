@@ -1,0 +1,19 @@
+
+int nowvelocity=motor.getVelocity();//读取滴答数
+int goalvelocity=3000;//设置目标滴答数
+int lateP=goalvelocity;
+int deltavelocity;//定义需要设置的滴答数
+double P;
+double I;
+double D;
+double Kp=0.2; //比例增益 //TODO 待调整
+double Tt=0.15; //积分时间常数 //TODO 待调整
+double Td=0.03; //微分时间常数 //TODO 待调整
+P=goalvelocity-nowvelocity;
+I=I+P;
+D=P-lateP;
+deltavelocity=Kp*(P+1/Tt*I+Td*D);
+lateP=P；
+latevelocity=nowvelocity;
+motor.setVelocity(nowVelocity+deltavelocity);
+
