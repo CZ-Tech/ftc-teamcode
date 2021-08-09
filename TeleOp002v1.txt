@@ -1,0 +1,143 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+
+
+@TeleOp(name="TeleOp002", group="Iterative Opmode")
+
+
+public class TeleOp002 extends OpMode
+{
+//region 定义各变量
+
+
+    //region 定义时间
+    private ElapsedTime runtime = new ElapsedTime();
+    //endregion
+
+    //region 定义电机
+
+    private DcMotor LFmotor;
+    private DcMotor LRmotor;
+    private DcMotor RFmotor;
+    private DcMotor RRmotor;
+    //endregion
+
+    // region 定义功率
+    double power_LFmotor;
+    double power_LRmotor;
+    double power_RFmotor;
+    double power_RRmotor;
+    //endregion
+
+    //region 定义手柄上的摇杆上的拨动时的输出的数值
+    double p1lx;
+    double p1rx;
+    double p1ly;
+    double p2ly;
+    //endregion
+
+//endregion
+
+//region 初始化
+
+    @Override
+    public void init()
+    {
+        // region 初始化电机
+
+        //region 配对电机
+        //RR:right rear
+        //RF:right front
+        //LF:left front
+        LFmotor = hardwareMap.get(DcMotor.class, "LFmotor");
+        RFmotor = hardwareMap.get(DcMotor.class, "RFmotor");
+        LRmotor = hardwareMap.get(DcMotor.class, "LRmotor");
+        RRmotor = hardwareMap.get(DcMotor.class, "RRmotor");
+        // endregion
+
+        //region 设置电机的转动方向
+        LFmotor.setDirection(DcMotor.Direction.FORWARD);
+        LRmotor.setDirection(DcMotor.Direction.FORWARD);
+        RFmotor.setDirection(DcMotor.Direction.REVERSE);
+        RRmotor.setDirection(DcMotor.Direction.REVERSE);
+        //endregion
+
+        //region 输出“初始化已完成”
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        //endregion
+        //endregion
+    }
+
+    @Override
+    public void init_loop()
+    {
+
+    }
+
+
+//region 开始
+
+
+    //region重置机器人运行时间
+    @Override
+    public void start()//
+    {
+        runtime.reset();
+
+    }
+    //endregion
+
+    //region 主循环
+
+
+    @Override
+    public void loop()
+    {
+        //region 底盘手动程序
+
+
+        //region 读取手柄上的信息
+        p1lx = gamepad1.left_stick_x;
+        p1ly = -gamepad1.left_stick_y;
+        p1rx = Range.clip(gamepad1.right_stick_x, -1, 1);
+        //endregion
+
+        //region 计算得到底盘各电机要输出的功率
+        power_LFmotor = Range.clip(p1ly + p1lx + p1rx, -1, 1);
+        power_RFmotor = Range.clip(p1ly - p1lx - p1rx, -1, 1);
+        power_LRmotor = Range.clip(p1ly - p1lx + p1rx, -1, 1);
+        power_RRmotor = Range.clip(p1ly + p1lx - p1rx, -1, 1);
+        //endregion
+
+        //region 为各电机输出功率
+        LFmotor.setPower(power_LFmotor);
+        RFmotor.setPower(power_RFmotor);
+        LRmotor.setPower(power_LRmotor);
+        RRmotor.setPower(power_RRmotor);
+        //endregion
+
+
+        // region 输出信息
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Motors", "LFmotor (%.2f), RFmotor (%.2f), LRmotor(%.2f), RRmotor(%.2f)", power_LFmotor, power_RFmotor, power_RFmotor, power_RRmotor);
+        //endregion
+
+    }
+    //endregion
+
+    //endregion
+    public void stop()
+    {
+
+    }
+}
+
