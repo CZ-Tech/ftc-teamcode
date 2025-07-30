@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>调试</title>
+    </head>
+    <body>
+        <p>666</p>
+        <button onclick="test1()">击败</button>
+        
+        <script>
+            function test1() {
+                a = new one(114, 514)
+                b = new one(1919, 810)
+                let myarray = [a, b]
+                myarray[0].a = 0;
+                
+                console.log(`a.a:${a.a}`)
+                console.log(`myarray[0]:${myarray[0].a}`)
+                
+            
+            }
+
+            class one {
+                constructor(a, b) {
+                    this.a = a;
+                    this.b = b;
+                }
+
+                jibai() {
+                    console.log("otto")
+                }
+            }
+            class theother {
+                constructor(one) {
+                    this.a = one.a;
+                    this.b = one.b;
+                }
+            }
+
+        </script>
+        <script>
+            // 定义样条拟合函数
+            function splineFit(x0, dx0, x1, dx1) {
+                const a = 2 * x0 + dx0 - 2 * x1 + dx1;
+                const b = -3 * x0 - 2 * dx0 + 3 * x1 - dx1;
+                const c = dx0;
+                const d = x0;
+                return [a, b, c, d]; // 返回一个数组
+            }
+
+            // 定义样条获取函数
+            function splineGet(spline, u) {
+                const [a, b, c, d] = spline;
+                return a * Math.pow(u, 3) + b * Math.pow(u, 2) + c * u + d;
+            }
+
+            // 生成 u 的值
+            const u = Array.from({ length: 100 }, (_, i) => i / 99); // 从 0 到 1 的 100 个点
+
+            // 计算样条
+            const xSpline = splineFit(-6, 0, -6, 0);
+            const ySpline = splineFit(60, 0, 36, 0);
+
+            // 计算 x 和 y 的值
+            const xValues = u.map(uVal => splineGet(xSpline, uVal));
+            const yValues = u.map(uVal => splineGet(ySpline, uVal));
+
+            // 输出 x 和 y 的值
+            console.log("x values:", xValues);
+            console.log("y values:", yValues);
+
+            // 如果你想绘制曲线，可以使用 Chart.js、D3.js 或其他图形库
+
+        </script>
+    </body>
+</html>

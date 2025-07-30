@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>轨迹制作器</title>
+        <style>
+            #drawspace {
+                position: absolute;
+                right: 0px;
+                width: 720px;
+                height: 720px;
+            }
+            #toolbar{
+                position: absolute;
+                left: 0px;
+                width: 65px;
+                height: 720px;
+            }
+            #container{
+                position: relative;
+                width: 785px;
+                height: 720px;
+            }
+            #image {
+                width: 100%;
+                height: 100%;
+            }
+
+            #canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(255, 255, 255, 0); /* 透明背景 */
+            }
+            #canvastraj {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(255, 255, 255, 0); /* 透明背景 */
+            }
+                    /* 悬浮窗口的样式 */
+            #floating-window {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 300px;
+                padding: 20px;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+            }
+
+            /* 遮罩层的样式 */
+            #overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            /* 关闭按钮的样式 */
+            .close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+                font-size: 18px;
+                color: #333;
+            }
+
+            .button {
+                /* border-style: groove; */
+                background-color: rgba(255, 255, 255, 0);
+                color: black;
+                transition: transform 1s, backgroud-color 1s;
+                margin: 10px, 10px;
+                /* border-style: solid; */
+            }
+
+            .button:hover {
+                background-color: rgb(3, 85, 193);
+                color:white;
+            }
+
+            #exit:hover {
+                background-color: rgb(255, 0, 0)!important;
+                color:white;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <div id="overlay"></div>
+        <div id="floating-window">
+            <span class="close-btn" onclick="closeWindow()">×</span>
+            <h3>配置坐标</h3>
+            <form name="setRotation">
+            x:<input type="number" name="deltaX"><br>
+            y:<input type="number" name="deltaY"><br>
+            旋转:<select name="rotate">
+                    <option value="0">0°</option>
+                    <option value="90">90°</option>
+                    <option value="180">180°</option>
+                    <option value="270">270°</option>
+                </select><br>
+            <input type="checkbox" name="mirror" value="x">X轴翻折<br>
+            <input type="checkbox" name="mirror" value="y">Y轴翻折<br>
+            </form>
+            <span class="button" onclick="setConvert()">确定</span>
+            <span class="button" onclick="closeWindow()" id="exit">取消</span>
+        </div>    
+        <div id="container">
+            <div id="toolbar">
+                <p id="state">Drag</p>
+                <span class="button" id="btnDraw" onclick="buttonOnClick()">draw</span>
+                <span class="button" id="drawpoint" onclick="statePoint()">point</span>
+                <span class="button" onclick="stateVector()">vector</span>
+                <span class="button" onclick="stateDrag()">drag</span>
+                <span class="button" onclick="deleteall()">deleteall</span>
+                <span class="button" onclick="showWindow()">show</span>
+            </div>
+            <div id="drawspace">
+                <canvas id="canvastraj" width="720" height="720" style="border: 1px solid #ccc;"></canvas>
+                <canvas id="canvas" width="720" height="720" style="border: 1px solid #ccc;"></canvas>
+                <!-- <img id="image" src="../bouncyFTC/into-the-deep.png"> -->
+                <img id="image" src="into-the-deep2.png">
+            </div>
+        </div>
+            <textarea name="" id="traj" rows="40" cols="80">
+                .addPoint(2, -10, 10, 0, 0)
+                .addPoint(2, -10, 10, -50, -50)
+                .addPoint(5, -20, 50, 0, 0)
+            </textarea>
+            <!-- [^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^\d]* -->
+            
+        <script>
+            // 关闭悬浮窗口的函数
+            function closeWindow() {
+                document.getElementById('floating-window').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+            function showWindow() {
+                document.getElementById('floating-window').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+            }
+
+    
+            // 初始化时显示悬浮窗口
+            window.onload = function() {
+                document.getElementById('floating-window').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            };
+        </script>
+        <script>
+            function setConvert() {
+                convertX = formRotation["deltaX"].value;
+                convertY = formRotation["deltaY"].value;
+                console.log(Number(formRotation["rotate"].value) + 1);
+                // rotationAngle = Number(formRotation["rotate"].value);
+                switch (formRotation["rotate"].value) {
+                    case "0":
+                        rotationAngle = 0;
+                        break;
+                    case "90":
+                        rotationAngle = Math.PI / 2;
+                        break;
+                    case "180":
+                        rotationAngle = Math.PI;
+                        break;
+                    case "270":
+                        rotationAngle = Math.PI * 3 / 2;
+                        break;
+                }
+                if(formRotation['mirror'][0].checked && formRotation['mirror'][1].checked) {
+                    mirrorstate = 'mlxr';
+                } else if(formRotation['mirror'][0].checked) {
+                    mirrorstate = 'x';
+                } else if (formRotation['mirror'][1].checked) {
+                    mirrorstate = 'y';
+                } else {
+                    mirrorstate = '';
+                }
+                console.log(formRotation['mirror'][0].value);
+                console.log(formRotation['mirror']);
+
+                document.getElementById('floating-window').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+        </script>
+        <script>
+            function reverseTransform(x, y, tx, ty, rotation, flip) {
+                // Step 1: Reverse translation
+                reversedX = x - tx;
+                reversedY = y - ty;
+
+                // Step 2: Reverse rotation
+                switch (rotation) {
+                    case 0:
+                        // No rotation, do nothing
+                        break;
+                    case 90:
+                        // Reverse 90° rotation: (x, y) -> (y, -x)
+                        [reversedX, reversedY] = [reversedY, -reversedX];
+                        break;
+                    case 180:
+                        // Reverse 180° rotation: (x, y) -> (-x, -y)
+                        [reversedX, reversedY] = [-reversedX, -reversedY];
+                        break;
+                    case 270:
+                        // Reverse 270° rotation: (x, y) -> (-y, x)
+                        [reversedX, reversedY] = [-reversedY, reversedX];
+                        break;
+                    default:
+                        pass();
+                        // throw new Error("Invalid rotation angle. Must be 0, 90, 180, or 270.");
+                }
+
+                // Step 3: Reverse flip
+                switch (flip) {
+                    case "x":
+                        // Reverse flip along x-axis: (x, y) -> (x, -y)
+                        reversedY = -reversedY;
+                        break;
+                    case "y":
+                        // Reverse flip along y-axis: (x, y) -> (-x, y)
+                        reversedX = -reversedX;
+                        break;
+                    case "mlxr":
+                    case "xy":
+                    case "yx":
+                        // Reverse flip along both axes: (x, y) -> (-x, -y)
+                        reversedX = -reversedX;
+                        reversedY = -reversedY;
+                        break;
+                    case '':
+                    case "cbjq":pass();
+                    default:
+                        pass();
+                        // throw new Error("Invalid flip type. Must be 'x', 'y', or 'xy'.");
+                }
+
+                // Return the original coordinates
+                return { x: reversedX, y: reversedY };
+            }
+
+        </script>
+
+        <script>
+            //Objects
+            class CanvasObject {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.isChosen = false;
+                    this.isdelete = false;
+                    console.log("object created!")
+                }
+                draw() {}
+                choose() {}
+                move(x, y) {
+                    this.x = x;
+                    this.y = y;
+                }
+                onChose(state) {
+                    this.isChosen = state;
+                    
+                }
+            }
+
+            class Point extends CanvasObject {
+
+                constructor(x, y, color = "red", range = 5) {
+                    super(x, y)
+                    this.color = color;
+                    this.range = 5;
+                    console.log("point created")
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    if (this.isChosen) {
+                        ctx.arc(this.x, this.y, this.range + 2, 0, Math.PI * 2);
+                        ctx.fillStyle = "blue"; // 点的颜色
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2); // 绘制半径为5的圆
+                    ctx.fillStyle = this.color; // 点的颜色
+                    ctx.fill();
+                    ctx.closePath();
+                }
+
+                choose(mouseX, mouseY) {
+                    const dx = this.x - mouseX;
+                    const dy = this.y - mouseY;
+                    if (Math.sqrt(dx * dx + dy * dy) < this.range) { // 半径为5的范围内
+                        return true; // 记录当前拖动的点
+                    } else {
+                        return false;
+                    }
+                }
+
+
+                onChose(state) {
+                    this.isChosen = state;
+                    
+                }
+            }
+
+            class Vector extends CanvasObject {
+                constructor(points, color = "red") {
+                    super(points[0].x, points[1].y)
+                    this.startpoint = points[0];
+                    this.endpoint = points[1];
+                    this.color = color;
+                    this.isdelete = false;
+                    this.dx = 0;
+                    this.dy = 0;
+                    $LOG("vector created!");
+                }
+
+                draw() {
+                    if(!this.startpoint && !this.endpoint) {
+                        this.isdelete = true;
+                        return;
+                    }
+                    if(this.startpoint.isdelete || this.endpoint.isdelete) {
+                        this.isdelete = true;
+                        return;
+                    }
+                    if(this.isdelete) {
+                        return;
+                    }
+                    if (this.isChosen == true) {
+                        this.color = 'blue';
+                    } else {
+                        this.color = 'red';
+                    }
+                    ctx.strokeStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(this.startpoint.x, this.startpoint.y);
+                    ctx.lineTo(this.endpoint.x, this.endpoint.y);
+                    ctx.stroke();
+                    this.drawArrow(this.startpoint, this.endpoint);
+                }
+
+                drawArrow(from, to) {
+                    const headLength = 10; // 箭头长度
+                    const angle = Math.atan2(to.y - from.y, to.x - from.x); // 计算角度
+
+                    ctx.beginPath();
+                    ctx.moveTo(to.x, to.y);
+                    ctx.lineTo(to.x - headLength * Math.cos(angle - Math.PI / 6), to.y - headLength * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(to.x - headLength * Math.cos(angle + Math.PI / 6), to.y - headLength * Math.sin(angle + Math.PI / 6));
+                    ctx.lineTo(to.x, to.y);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                choose(mouseX, mouseY) {
+                    this.result = (((mouseY-this.startpoint.y)/(this.endpoint.y-this.startpoint.y)) == ((mouseX-this.startpoint.x)/(this.endpoint.x-this.startpoint.x)))
+                    if(this.result) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+            class Trajectory extends CanvasObject {
+                constructor(startVector, endVector) {
+                    super(startVector.x, startVector,y);
+                    this.x0 = this.x;
+                    this.y0 = this.y;
+                    this.dx0 = startVector.dx;
+                    this.dy0 = startVector.dy;
+                    this.x1 = endVector.x;
+                    this.y1 = endVector.y;
+                    this.dx1 = endVector.dx;
+                    this.dy1 = endVector.dy;
+                    this.color = 'red';
+                }
+
+                
+            }
+
+        </script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+        <script src="chart.js"></script>
+        <script>
+            //buttons
+            function drawTrajectoryPoint(x, y, color='red') {
+                // translated = convert(x, y, -360, -60, Math.PI*1.5, 'x')
+                translated = convert(x, y, convertX, convertY, rotationAngle, mirrorstate)
+                // translated = reverseTransform(x, y, convertX, convertY, Number(formRotation["rotate"]), mirrorstate);
+                ctxtraj.beginPath();
+                ctxtraj.arc(translated.x, translated.y, 2, 0, Math.PI * 2); // 绘制半径为5的圆
+                ctxtraj.fillStyle = color; // 点的颜色
+                ctxtraj.fill();
+                ctxtraj.closePath();
+
+            }
+
+            function buttonOnClick() {
+                // matches = textarea.textContent.split("\n");
+                
+                matches = textarea.value.split('\n');
+                patt = /^[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^-\d]*(-?\d+)[^\d]*.*$/ms;
+                trajpoints = [];
+                console.log(matches);
+                //matches.pop();
+                matches.forEach(match => {
+                    nm = match;
+                    console.log(match);
+                    result = patt.exec(nm);
+                    try {
+                        console.log(`t:${result[1]} x:${result[2]} y:${result[3]} dx:${result[4]} dy:${result[5]}`);
+                        trajpoints.push({t:Number(result[1]) ,x:Number(result[2]), y:Number(result[3]), dx:Number(result[4]), dy:Number(result[5])});
+                        console.log(`match:${result[0]}`)
+                    } catch(err) {
+                        pass();
+                    }
+                })
+                prevpoint = {t:0, x:0, y:0, dx:0, dy:0};
+                console.log(prevpoint);
+                trajpoints.forEach(trajpoint => {
+                    xSpline = splineFit(prevpoint.x, prevpoint.dx, trajpoint.x, trajpoint.dx);
+                    ySpline = splineFit(prevpoint.y, prevpoint.dy, trajpoint.y, trajpoint.dy);
+
+                    // 计算 x 和 y 的值
+                    xValues = u.map(uVal => splineGet(xSpline, uVal));
+                    yValues = u.map(uVal => splineGet(ySpline, uVal));
+
+                    drawtrajectory(xValues, yValues, colors[colorcode]);
+                    prevpoint = trajpoint;
+                    if(colorcode >= 9) {
+                        colorcode = 0;
+                    } else {
+                        colorcode++;
+                    }
+
+
+                });
+                // result = patt.exec(matches);
+                // console.log(`t:${result[1]} x:${result[2]} y:${result[3]} dx:${result[4]} dy:${result[5]}`)
+                // console.log(`match:${result[0]}`)
+                
+
+            }
+            function stateDrag() {
+                state = "drag";
+                displaystate.innerHTML = state;
+            }
+
+            function statePoint() {
+                state = "point";
+                displaystate.innerHTML = state;
+            }
+
+            function stateVector() {
+                state = "vector";
+                displaystate.innerHTML = state;
+                console.log("state vector");
+            }
+            function deleteall() {
+                CanvasObjects = [];
+                drawObjects();
+                cleartraj();
+            }
+            function drawtraj() {
+                // new Chart(ctxtraj,{
+                //     type: 'line',
+                //     data: {
+                //         labels: xValues,
+                //         datasets: [{
+                //             label:'',
+                //             data: yValues,
+                //             fill: false,
+                //             borderColor: 'rgb(75, 192, 192)',
+                //             tension: 0.1 // 平滑曲线
+                //         }]
+                //     },
+                //     options: {
+                //         responsive: true,
+                //         scales: {
+                //             x: {
+                //                 display: true,
+                //                 title: {
+                //                     display: false,
+                //                     text: 'X Axis'
+                //                 },
+                //                 suggestedMin: 0,
+                //                 suggestedMax: 720,
+                //             },
+                //             y: {
+                //                 display: false,
+                //                 label:{
+                //                     display: false
+                //                 },
+                //                 title: {
+                //                     display: false,
+                //                     text: 'Y Axis'
+                //                 }
+                //             }
+                //         },
+                //         plugins: {
+                //             legend: {
+                //                 display: false // 完全隐藏图例
+                //             }
+                //         },
+
+                //     }
+                // });
+
+            }
+
+
+        </script>
+        <script>
+            const $LOG=()=>console.log;
+            function pass() {}
+
+            function splineFit(x0, dx0, x1, dx1) {
+                const a = 2 * x0 + dx0 - 2 * x1 + dx1;
+                const b = -3 * x0 - 2 * dx0 + 3 * x1 - dx1;
+                const c = dx0;
+                const d = x0;
+                return [a, b, c, d]; // 返回一个数组
+            }
+
+            function splineGet(spline, u) {
+                const [a, b, c, d] = spline;
+                return a * Math.pow(u, 3) + b * Math.pow(u, 2) + c * u + d;
+            }
+
+            function drawtrajectory(xValues, yValues, color) {                
+                xValues.forEach((xValue, index) => {
+                    // setTimeout(drawTrajectoryPoint(-yValues[index] * 5, -xValue * 5, color), 3000);
+                    drawTrajectoryPoint(-xValue * 5,-yValues[index] * 5,  color)
+                    // ctxtraj.lineTo(xValue, yValues[index]);
+                    // drawTrajectoryPoint( yValues[index], xValue)
+                });
+                console.log("trying to show trajectory...")
+                // ctxtraj.stroke();
+                // ctxtraj.closePath();
+
+            }
+
+            function getRandomColor() {
+                return colors[Math.random() * 10];
+            }
+
+            function convert(x, y, offsetX, offsetY, theta, isMirrored = 'cbjq') {
+                // 反向旋转
+                if (isMirrored == 'x') 
+                {
+                    mirroredX = x;
+                    mirroredY = -y;
+                }
+                else if(isMirrored == 'y') 
+                {
+                    mirroredX = -x;
+                    mirroredY = y;
+                }
+                else if(isMirrored == 'mlxr') {
+                    mirroredX = -x;
+                    mirroredY = -y;
+                }
+                else {
+                    mirroredX = x;
+                    mirroredY = y;
+                }                
+                 
+                cosTheta = Math.cos(theta);
+                sinTheta = Math.sin(theta);
+                rotatedX = mirroredX * cosTheta + mirroredY * sinTheta;
+                rotatedY = -mirroredX * sinTheta + mirroredY * cosTheta;
+
+                // 反向平移
+                originalX = rotatedX - offsetX;
+                originalY = rotatedY - offsetY;
+
+
+                return { x: originalX, y: originalY };
+            }
+
+            
+
+
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            const ctxtraj = document.getElementById("canvastraj").getContext("2d");
+            const canvastraj = document.getElementById("canvastraj");
+            const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'black', 'orange', 'yellow'];  
+            let formRotation = document.forms["setRotation"];          
+            let convertX, convertY, rotationAngle = 0;
+            let mirrorstate = '';
+            let colorcode = 0;
+            // drawTrajectoryPoint(10, 0);
+            //drawTrajectoryPoint(10, 120);
+            //drawTrajectoryPoint(10, 240);
+            //drawTrajectoryPoint(10, 480);
+            //drawTrajectoryPoint(10, 600);
+            //drawTrajectoryPoint(10, 720);
+            // ctxtraj.translate(360, 60);
+            const displaystate = document.getElementById("state")
+
+            const textarea = document.getElementById("traj");
+            const u = Array.from({ length: 100 }, (_, i) => i / 99); // 从 0 到 1 的 100 个点
+            let state = "drag";
+            
+
+            let CanvasObjects = []; 
+            let draggingObject = null; 
+            let startpoint, endpoint = null;
+            let newvector = true;
+            let points = [];
+
+            CanvasObjects.push(new CanvasObject(0, 0));
+            drawTrajectoryPoint(0, 0)
+
+            function drawObjects() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布
+                CanvasObjects.forEach(canvasobject => {
+                    if(canvasobject.isdelete) {return}
+                    canvasobject.draw();
+                });
+            }
+
+            canvas.addEventListener('click', (event) => {
+                console.log("Mouse click detected!");
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left; // 获取相对于画布的X坐标
+                const y = event.clientY - rect.top;  // 获取相对于画布的Y坐标
+                let a={
+                    "drag":()=>{},
+                    "point":()=>{
+                        CanvasObjects.push(new Point(x, y)); // 添加新点
+                        console.log("Point push!");    
+                    },
+                    "vector":()=>{
+
+                        // var startpoint, endpoint;
+                        CanvasObjects.forEach(canvasobject => {
+                            if(canvasobject.choose(x, y)) {
+                                if (!newvector) {
+                                    canvasobject.onChose(true);
+                                    points[1] = canvasobject;
+                                    console.log("endpoint choosed!");
+                                    newvector = true;
+                                } else {
+                                    canvasobject.onChose(true);
+                                    points[0] = canvasobject;
+                                    newvector = false;
+                                    $LOG("startpoint choosed");
+                                }
+                            }
+                        });
+                        if (points[0] && points[1] && newvector) {
+                            CanvasObjects.push(new Vector(points.slice()));
+                            points[0].onChose(false);
+                            points[1].onChose(false);
+                            newvector = true;
+                            // startpoint = endpoint = null;
+                        }
+                    }
+                }
+                a[state]()
+
+                drawObjects(); // 重新绘制所有点
+            });
+
+            canvas.addEventListener('mousedown', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                // 检查是否点击在某个点上
+                var allnotchoose = true
+                if(state == "drag") {
+                CanvasObjects.forEach(canvasobject => {
+                    if(canvasobject.choose(x, y)) {
+                        draggingObject = canvasobject;
+                        canvasobject.onChose(true);
+                        allnotchoose = false;
+                    }
+                });
+                if(allnotchoose) {
+                    CanvasObjects.forEach(canvasobject => {canvasobject.onChose(false);});
+                }
+            }
+            });
+
+            canvas.addEventListener('mousemove', (event) => {
+            if (draggingObject) {
+                const rect = canvas.getBoundingClientRect();
+                var toX = event.clientX - rect.left; // 更新点的位置
+                var toY = event.clientY - rect.top;
+                draggingObject.move(toX, toY);
+                drawObjects(); // 重新绘制所有点
+            } else {
+                drawObjects();
+            }
+            
+            });
+
+
+            
+
+
+            // 监听鼠标抬起事件
+            canvas.addEventListener('mouseup', () => {
+                draggingObject = null; // 释放拖动的点
+            });
+
+            // 监听鼠标离开事件
+            canvas.addEventListener('mouseleave', () => {
+                draggingObject = null; // 释放拖动的点
+            });
+
+            document.addEventListener('keydown', () => {
+                if (event.key === 'Delete') {
+                    CanvasObjects.forEach((canvasobject, index) => {
+                        if(canvasobject.isChosen) {
+                            canvasobject.isdelete = true;
+                            CanvasObjects.splice(index, 1);
+                            // delete canvasobject;
+                            // canvasobject = null;
+                        }
+                    });
+
+                    drawObjects();
+                    console.log('Delete 键被按下');
+                    // 在这里添加你想要执行的代码
+                }
+            });
+
+
+
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function drawPoint(x, y) {
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2); // 绘制半径为5的圆
+                ctx.fillStyle = 'red'; // 点的颜色
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function cleartraj() {
+                ctxtraj.clearRect(-360, 0, canvas.width, canvas.height); // 清空画布
+            }
+
+        </script>
+                <!-- <script>
+                    ctxtraj.beginPath();
+                    ctxtraj.arc(0, 360, 5, 0, Math.PI * 2);
+                    ctxtraj.fillStyle = 'black'
+                    ctxtraj.fill();
+                    ctxtraj.closePath();
+                </script> -->
+    </body>
+</html>

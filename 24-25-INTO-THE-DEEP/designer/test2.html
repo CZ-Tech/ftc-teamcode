@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跟随鼠标的点</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* 防止出现滚动条 */
+        }
+        canvas {
+            border: 1px solid black; /* 可选：为画布添加边框 */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="4096" height="4096"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 清空画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 绘制点
+        function drawPoint(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2); // 绘制半径为5的圆
+            ctx.fillStyle = 'red'; // 点的颜色
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // 监听鼠标移动事件
+        canvas.addEventListener('mousemove', (event) => {
+            clearCanvas(); // 清空画布
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left; // 获取相对于画布的X坐标
+            const y = event.clientY - rect.top;  // 获取相对于画布的Y坐标
+            drawPoint(x, y); // 绘制点
+        });
+    </script>
+</body>
+</html>

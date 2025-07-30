@@ -1,0 +1,88 @@
+{
+  "drive": {
+    "Motor": {
+      "lfmotor": {
+        "Position": "CH",
+        "Id": 0
+      },
+      "rfmotor": {
+        "Position": "CH",
+        "Id": 1
+      },
+      "rrmotor": {
+        "Position": "CH",
+        "Id": 2
+      },
+      "lrmotor": {
+        "Position": "CH",
+        "Id": 3
+      }
+    }
+  },
+  "subsystem": {
+    "Arm": {
+      "Motor": {
+        "leftArmMotor": {
+          "Position": "EH",
+          "Id": 0
+        },
+        "rightArmMotor": {
+          "Position": "EH",
+          "Id": 1
+        }
+      }
+    },
+    "Grabber": {
+      "Servo": {
+        "grabber": {
+          "Position": "SH",
+          "Id": 0
+        }
+      }
+    },
+    "Ingrabber": {
+      "Servo": {
+        "leftturning": {
+          "Position": "SH",
+          "Id": 3
+        },
+        "leftingrabber": {
+          "Position": "CH",
+          "Id": 3
+        },
+        "rightturning": {
+          "Position": "SH",
+          "Id": 4
+        },
+        "rightingrabber": {
+          "Position": "EH",
+          "Id": 3
+        }
+      }
+    },
+    "Stretcher": {
+      "Servo": {
+        "leftexpand": {
+          "Position": "SH",
+          "Id": 1
+        },
+        "rightexpand": {
+          "Position": "SH",
+          "Id": 2
+        }
+      }
+    },
+    "Claw": {
+      "Servo": {
+        "claw": {
+          "Position": "EH",
+          "Id": 0
+        },
+        "clawturning": {
+          "Position": "SH",
+          "Id": 5
+        }
+      }
+    }
+  }
+}

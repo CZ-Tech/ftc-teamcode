@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可拖动的点</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* 防止出现滚动条 */
+        }
+        canvas {
+            border: 1px solid black; /* 可选：为画布添加边框 */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="720" height="720"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let points = []; // 存储点的数组
+        let draggingPoint = null; // 当前拖动的点
+
+        // 绘制所有点
+        function drawPoints() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布
+            points.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, Math.PI * 2); // 绘制半径为5的圆
+                ctx.fillStyle = 'blue'; // 点的颜色
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
+
+        // 监听鼠标单击事件
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left; // 获取相对于画布的X坐标
+            const y = event.clientY - rect.top;  // 获取相对于画布的Y坐标
+            points.push({ x, y }); // 添加新点
+            drawPoints(); // 重新绘制所有点
+        });
+
+        // 监听鼠标按下事件
+        canvas.addEventListener('mousedown', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // 检查是否点击在某个点上
+            points.forEach(point => {
+                const dx = point.x - x;
+                const dy = point.y - y;
+                if (Math.sqrt(dx * dx + dy * dy) < 5) { // 半径为5的范围内
+                    draggingPoint = point; // 记录当前拖动的点
+                }
+            });
+        });
+
+        // 监听鼠标移动事件
+        canvas.addEventListener('mousemove', (event) => {
+            if (draggingPoint) {
+                const rect = canvas.getBoundingClientRect();
+                draggingPoint.x = event.clientX - rect.left; // 更新点的位置
+                draggingPoint.y = event.clientY - rect.top;
+                drawPoints(); // 重新绘制所有点
+            }
+        });
+
+        // 监听鼠标抬起事件
+        canvas.addEventListener('mouseup', () => {
+            draggingPoint = null; // 释放拖动的点
+        });
+
+        // 监听鼠标离开事件
+        canvas.addEventListener('mouseleave', () => {
+            draggingPoint = null; // 释放拖动的点
+        });
+    </script>
+</body>
+</html>

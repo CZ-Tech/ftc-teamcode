@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Curve Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="400"></canvas>
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        // 生成 x 和 y 数据
+        const xValues = [];
+        const yValues = [];
+        const step = 0.01; // 步长
+        for (let x = 5; x <= 6; x += step) {
+            xValues.push(x);
+            yValues.push(Math.sin(x)); // 你可以替换为其他函数
+        }
+
+        // 创建图表
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: xValues, // x 轴的标签
+                datasets: [{
+                    label: 'y = sin(x)',
+                    data: yValues, // y 值
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        min: 5, // x 轴最小值
+                        max: 6, // x 轴最大值
+                        title: {
+                            display: true,
+                            text: 'X Axis'
+                        }
+                    },
+                    y: {
+                        min: -10, // y 轴最小值
+                        max: 10, // y 轴最大值
+                        title: {
+                            display: true,
+                            text: 'Y Axis'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
