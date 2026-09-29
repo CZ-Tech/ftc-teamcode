@@ -1,0 +1,178 @@
+[
+    {
+        "x": -16.90203285217285,
+        "dx": 50.0,
+        "y": -25.319777816534042,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 29.678373336791992,
+        "dx": 50.0,
+        "y": -6.920517444610596,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 37.92975997924805,
+        "dx": 50.0,
+        "y": -41.25693130493164,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -13.974122047424316,
+        "dx": -112.3659896850586,
+        "y": -39.62661623954773,
+        "dy": -33.438076972961426,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -29.146026611328125,
+        "dx": 50.0,
+        "y": -30.609981536865234,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -35.603670954704285,
+        "dx": 50.0,
+        "y": -24.28372573852539,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -37.97765338420868,
+        "dx": 61.8994414806366,
+        "y": -17.564244508743286,
+        "dy": 2.6815640926361084,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -16.759777069091797,
+        "dx": 50.0,
+        "y": -10.592178344726562,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": -8.178771018981934,
+        "dx": 50.0,
+        "y": -9.251396179199219,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 4.960893630981445,
+        "dx": 50.0,
+        "y": -7.642457962036133,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 14.882680892944336,
+        "dx": 50.0,
+        "y": -6.301675796508789,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 24.804468154907227,
+        "dx": 50.0,
+        "y": -3.6201117038726807,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 36.067039489746094,
+        "dx": 50.0,
+        "y": -0.13407820463180542,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 45.9553062915802,
+        "dx": 50.0,
+        "y": -1.4748601913452148,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 51.864291071891785,
+        "dx": 50.0,
+        "y": -10.327054977416992,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    },
+    {
+        "x": 24.0,
+        "dx": 50.0,
+        "y": -47.59776306152344,
+        "dy": 0.0,
+        "heading": 0.0,
+        "dHeading": 0.0,
+        "duration": 1.0,
+        "marker": "",
+        "delayAfterArrive": 0.0
+    }
+]
